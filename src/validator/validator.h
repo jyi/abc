@@ -81,7 +81,13 @@ public:
    * you've constructed constraints the same way the validator does and know
    * what you're doing.  Ignores memory. */
   static CpuState state_from_model(SMTSolver& smt, const std::string& name_suffix);
+  Cfg inline_functions_public(const Cfg& cfg) {
+    return inline_functions(cfg);
+  }
 
+  void sanity_checks_public(const Cfg& cfg1, const Cfg& cfg2) {
+    sanity_checks(cfg1, cfg2);
+  }
 protected:
 
   /** Check that def-ins, live-outs match, and that non-control flow
