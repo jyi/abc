@@ -14,6 +14,7 @@
 
 
 #include <iostream>
+#include <fstream> //thuanpv
 #include <chrono>
 
 #include "src/solver/z3solver.h"
@@ -104,6 +105,13 @@ bool Z3Solver::is_sat(const vector<SymBool>& constraints) {
 #ifdef DEBUG_Z3_INTERFACE_PERFORMANCE
     microseconds solver_start = duration_cast<microseconds>(system_clock::now().time_since_epoch());
 #endif
+    //-->thuanpv
+    cout << "[DEBUG]:[z3]" << solver_.to_smt2() << "\n";
+    ofstream smt2file;
+    smt2file.open("/tmp/stoke.smt2");
+    smt2file << solver_.to_smt2();
+    smt2file.close();
+    //<--thuanpv
     auto result = solver_.check();
 #ifdef DEBUG_Z3_INTERFACE_PERFORMANCE
     microseconds solver_end = duration_cast<microseconds>(system_clock::now().time_since_epoch());
