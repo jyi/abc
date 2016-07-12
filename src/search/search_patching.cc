@@ -17,7 +17,7 @@
 #include <csignal>
 #include <unistd.h>
 
-#include "src/search/search.h"
+#include "src/search/search_patching.h"
 #include "src/transform/weighted.h"
 
 using namespace cpputil;
@@ -36,7 +36,7 @@ void handler(int sig, siginfo_t* siginfo, void* context) {
 
 namespace stoke {
 
-Search::Search(Transform* transform) : transform_(transform) {
+SearchPatching::SearchPatching(Transform* transform) : transform_(transform) {
   set_seed(0);
   set_timeout_itr(0);
   set_timeout_sec(steady_clock::duration::zero());
@@ -59,7 +59,7 @@ Search::Search(Transform* transform) : transform_(transform) {
   }
 }
 
-void Search::run(const Cfg& target, CostFunction& fxn, Init init, SearchState& state, vector<TUnit>& aux_fxns) {
+void SearchPatching::run(const Cfg& target, CostFunction& fxn, Init init, SearchState& state, vector<TUnit>& aux_fxns) {
 
   // Configure initial state
   configure(target, fxn, state, aux_fxns);
@@ -158,15 +158,15 @@ void Search::run(const Cfg& target, CostFunction& fxn, Init init, SearchState& s
   state.best_yet.recompute();
 }
 
-StatisticsCallbackData Search::get_statistics() const {
+StatisticsCallbackData SearchPatching::get_statistics() const {
   return {move_statistics, num_iterations, elapsed, transform_};
 }
 
-void Search::stop() {
+void SearchPatching::stop() {
   give_up_now = true;
 }
 
-void Search::configure(const Cfg& target, CostFunction& fxn, SearchState& state, vector<TUnit>& aux_fxn) const {
+void SearchPatching::configure(const Cfg& target, CostFunction& fxn, SearchState& state, vector<TUnit>& aux_fxn) const {
   state.current.recompute();
   state.best_yet.recompute();
   state.best_correct.recompute();

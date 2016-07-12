@@ -119,6 +119,8 @@ SRC_OBJ=\
 	src/search/search.o \
 	src/search/search_state.o \
 	\
+        src/search/search_patching.o \
+        \
 	src/solver/z3solver.o \
 	src/solver/cvc4solver.o \
 	\
@@ -193,6 +195,7 @@ TOOL_ARGS_OBJ=\
 	tools/args/sandbox.o \
 	tools/args/search.o \
 	tools/args/search_state.o \
+        tools/args/search_patching.o \
 	tools/args/seed.o \
 	tools/args/solver.o \
 	tools/args/target.o \
@@ -219,6 +222,7 @@ BIN=\
 	bin/stoke_extract \
 	bin/stoke_replace \
 	bin/stoke_search \
+        bin/stoke_search_patching \
 	bin/stoke_testcase \
 	bin/stoke_tcgen \
         bin/stoke_extract_formulas \

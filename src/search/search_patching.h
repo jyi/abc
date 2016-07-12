@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef STOKE_SRC_SEARCH_SEARCH_H
-#define STOKE_SRC_SEARCH_SEARCH_H
+#ifndef STOKE_SRC_SEARCH_SEARCH_PATCHING_H
+#define STOKE_SRC_SEARCH_SEARCH_PATCHING_H
 
 #include <chrono>
 #include <random>
@@ -29,45 +29,45 @@
 
 namespace stoke {
 
-class Search {
+class SearchPatching {
 public:
   /** Create a new search from a transform helper. */
-  Search(Transform* transform);
+  SearchPatching(Transform* transform);
 
   /** Set the random search seed. */
-  Search& set_seed(std::default_random_engine::result_type seed) {
+  SearchPatching& set_seed(std::default_random_engine::result_type seed) {
     gen_.seed(seed);
     return *this;
   }
   /** Set the maximum number of proposals to perform before giving up. */
-  Search& set_timeout_itr(size_t timeout) {
+  SearchPatching& set_timeout_itr(size_t timeout) {
     timeout_itr_ = timeout;
     return *this;
   }
   /** Set the maximum number of seconds to run for before giving up. */
-  Search& set_timeout_sec(std::chrono::duration<double> timeout) {
+  SearchPatching& set_timeout_sec(std::chrono::duration<double> timeout) {
     timeout_sec_ = timeout;
     return *this;
   }
   /** Set the annealing constant. */
-  Search& set_beta(double beta) {
+  SearchPatching& set_beta(double beta) {
     beta_ = beta;
     return *this;
   }
   /** Set progress callback function. */
-  Search& set_progress_callback(ProgressCallback cb, void* arg) {
+  SearchPatching& set_progress_callback(ProgressCallback cb, void* arg) {
     progress_cb_ = cb;
     progress_cb_arg_ = arg;
     return *this;
   }
   /** Set statistics callback function. */
-  Search& set_statistics_callback(StatisticsCallback cb, void* arg) {
+  SearchPatching& set_statistics_callback(StatisticsCallback cb, void* arg) {
     statistics_cb_ = cb;
     statistics_cb_arg_ = arg;
     return *this;
   }
   /** Set the number of proposals to perform between statistics updates. */
-  Search& set_statistics_interval(size_t si) {
+  SearchPatching& set_statistics_interval(size_t si) {
     interval_ = si;
     return *this;
   }
