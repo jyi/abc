@@ -311,15 +311,33 @@ int main(int argc, char** argv) {
 
   SeedGadget seed;
   FunctionsGadget aux_fxns;
+  //TargetGadget inherits CfgGadget in which
+  //It initializes the target function (passed by "target" option -- as defined in target.inc)
+  //And list of helper functions (passed by "functions" option -- as defined in functions.inc)
+  //More specifically, inside Cfg class (in cfg.h), the target function and its def-ins and live-outs will be kept.
+  //Moreover, the control flow of the target function will be built as well
   TargetGadget target(aux_fxns, init_arg == Init::ZERO);
 
+  //TrainingSetGadget inherits CpuStates which is a vector of CpuState objects
+  //Each CpuState represents one test case
   TrainingSetGadget training_set(seed);
+  //In the constructor of Sandbox class, it insert all auxiliary (helper) functions into a list
+  //In addition, it also insert all test cases in training set into another list
   SandboxGadget training_sb(training_set, aux_fxns);
 
+  //Initilize of the pool containing opcodes, immediates (constants), memory operands, labels to helper functions
+  //These things can come from the target program and can be provided by user as well (through whitelist, immediates options for example)
+  //All Transform pass will pick item(s) from this pool
   TransformPoolsGadget transform_pools(target, aux_fxns, seed);
+
+  //Insert all supported transformation passes into a list
+  //At one time, a specific transformation pass will be selected from this list and do its job to optimize/synthesize code
   WeightedTransformGadget transform(transform_pools, seed);
+
+  //Initialize a search object, it is the main object doing code transformation
   SearchGadgetPatching search(&transform, seed);
 
+  //Create another sandbox for test cases used to test the optimized/synthesized binary
   TestSetGadget test_set(seed);
   SandboxGadget test_sb(test_set, aux_fxns);
 
@@ -340,6 +358,7 @@ int main(int argc, char** argv) {
   size_t total_restarts = 0;
 
   // attempt to parse cycle_timeout argument
+  // cycle_timetout is timeout (as number of iterations) per cycle
   vector<string> parts;
   vector<Expr<size_t>*> cycle_timeouts;
   for (auto& part : split(cycle_timeout_arg.value(), ",", parts)) {
@@ -357,7 +376,11 @@ int main(int argc, char** argv) {
   }
 
   string final_msg;
+
+  //Initilize SearchState 
   SearchStateGadget state(target, aux_fxns);
+
+  //Loop to find optimized version of the target code
   for (size_t i = 0; ; ++i) {
     CostFunctionGadget fxn(target, &training_sb, &perf_sb);
 
