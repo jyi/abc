@@ -31,13 +31,13 @@
 #include "src/search/failed_verification_action.h"
 #include "src/search/postprocessing.h"
 
-#include "tools/args/search.inc"
+#include "tools/args/search_patching.inc"
 #include "tools/args/target.inc"
 #include "tools/gadgets/cost_function.h"
 #include "tools/gadgets/correctness_cost.h"
 #include "tools/gadgets/functions.h"
 #include "tools/gadgets/sandbox.h"
-#include "tools/gadgets/search.h"
+#include "tools/gadgets/search_patching.h"
 #include "tools/gadgets/search_state.h"
 #include "tools/gadgets/seed.h"
 #include "tools/gadgets/solver.h"
@@ -318,7 +318,7 @@ int main(int argc, char** argv) {
 
   TransformPoolsGadget transform_pools(target, aux_fxns, seed);
   WeightedTransformGadget transform(transform_pools, seed);
-  SearchGadget search(&transform, seed);
+  SearchGadgetPatching search(&transform, seed);
 
   TestSetGadget test_set(seed);
   SandboxGadget test_sb(test_set, aux_fxns);
