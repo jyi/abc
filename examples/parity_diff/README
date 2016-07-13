@@ -1,0 +1,4 @@
+Run example:
+    make clean;
+    make orig bug diff;
+    make extract extract_bug;
