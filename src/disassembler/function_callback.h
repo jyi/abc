@@ -19,6 +19,7 @@
 #include "src/tunit/tunit.h"
 
 #include <string>
+#include <set>
 
 namespace stoke {
 
@@ -31,6 +32,13 @@ struct FunctionCallbackData {
   std::string name;
   /** An equivalent x64asm function (offsets may be different) (valid if parsing succeeds)*/
   TUnit tunit;
+  /** Set of opcodes */
+  //std::set<std::string> opcodes;
+  std::set<x64asm::Opcode> opcodes;
+  /** Set of memory addresses */
+  std::set<x64asm::Imm64> mems;
+  /** Set of immediates */
+  std::set<x64asm::Imm64> immediates;
 };
 
 /** Callback signature */

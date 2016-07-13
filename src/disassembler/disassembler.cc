@@ -17,6 +17,9 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
+#include <algorithm>
+#include <set>
+#include <vector>
 
 #include "src/ext/cpputil/include/io/fail.h"
 #include "src/ext/x64asm/include/x64asm.h"
@@ -28,6 +31,23 @@ using namespace std;
 using namespace x64asm;
 
 namespace {
+
+// trim from start
+static inline string ltrim(string str) {
+  str.erase(str.begin(), find_if(str.begin(), str.end(), not1(ptr_fun<int, int>(isspace))));
+  return str;
+}
+
+// trim from end
+static inline string rtrim(string str) {
+  str.erase(find_if(str.rbegin(), str.rend(), not1(ptr_fun<int, int>(isspace))).base(), str.end());
+  return str;
+}
+
+// trim from both ends
+static inline string trim(string str) {
+  return ltrim(rtrim(str));
+}
 
 /** Returns true if the first n characters of a string match a prefix */
 bool is_prefix(const std::string& s, const char* prefix, size_t len) {
@@ -281,7 +301,7 @@ bool Disassembler::parse_line(const string& s, LineInfo& line) {
   const auto tab2 = s.find_first_of('\t', tab1 + 1);
   const auto colon = s.find_first_of(':');
 
-  // Record line offset
+  // Record line offsets
   line.offset = hex_to_int(s.substr(2, colon-2));
   // Count hex bytes
   line.hex_bytes = 0;
@@ -302,6 +322,49 @@ bool Disassembler::parse_line(const string& s, LineInfo& line) {
   const auto len = min(comment, annot) - begin;
 
   line.instr = s.substr(begin, len);
+
+  // dungnm: Find the opcode of this line
+  const auto space = line.instr.find_first_of(' ');
+  string opcode_str = line.instr.substr(0, space);
+  //line.opcode = line.instr.substr(0, space);
+  for (size_t i=0; i < X64ASM_NUM_OPCODES; ++i) {
+    const Opcode opc = (Opcode)i;
+    if (opcode_write_att(opc) == opcode_str) {
+      //cout << "OPCODE: " << i << endl;
+      //cout << opc << endl;
+      line.opc = opc;
+      break;
+    }
+  }
+  //Opcode op = (Opcode)1;
+  //cout << "Opcode: " << opcode_write_att(op) << endl;
+  //cout << "Opcode: " << opcode_write_intel(op) << endl;
+
+  // Find memory address if the opcode is a jump instruction or a call instruction
+  const auto percent = line.instr.find('%');
+  if (percent == string::npos &&
+        (opcode_str == "call" || opcode_str == "callq" ||
+         opcode_str == "je" || opcode_str == "jne" ||
+         opcode_str == "jb" || opcode_str == "jbe" ||
+         opcode_str == "jmp" || opcode_str == "jmpq")) {
+      //line.mem = Imm64(hex_to_int(trim(line.instr.substr(space, line.instr.size()-space))));
+      line.mem = hex_to_int(trim(line.instr.substr(space, line.instr.size()-space)));
+  } else {
+    //line.mem = Imm64(0);
+    line.mem = 0;
+  }
+
+  // Find immediate of this line
+  const auto dollar = line.instr.find_first_of('$');
+  if (dollar != string::npos &&
+          (opcode_str != "lea" || opcode_str != "leaq")) {
+    const auto comma = line.instr.find_first_of(',');
+    //line.imm = Imm64(hex_to_int(line.instr.substr(dollar+3, comma-dollar-3)));
+    line.imm = hex_to_int(line.instr.substr(dollar+3, comma-dollar-3));
+  } else {
+    //line.imm = Imm64(0);
+    line.imm = 0;
+  }
   return true;
 }
 
@@ -350,6 +413,10 @@ vector<Disassembler::LineInfo> Disassembler::parse_lines(ipstream& ips, const st
     // When that happens only add hex bytes to previous result
     LineInfo line;
     if (parse_line(s, line)) {
+      //cout << "offset: " << line.offset << " hex: " << line.hex_bytes << " instr: " << line.instr << endl;
+      //cout << "opcode: " << line.opcode << endl;
+      //if (line.imm != 0) cout << "immediate: " << line.imm << endl;
+      //if (line.mem != 0) cout << "mem: " << line.mem << endl;
       lines.push_back(line);
       parse_ptr(s, ptrs);
     } else {
@@ -386,15 +453,16 @@ vector<Disassembler::LineInfo> Disassembler::parse_lines(ipstream& ips, const st
 
   // Insert label definitions where necessary and fix instruction text
   // @todo The fact that we split lock into two instructions is going to bite us here
+  // dungnm: Modify to initialize the additional field of the structure LineInfo
   vector<LineInfo> result;
-  result.push_back({lines[0].offset, 0, string(".") + name + string(":")});
+  result.push_back({lines[0].offset, 0, string(".") + name + string(":"), LABEL_DEFN, 0, 0});
   for (const auto& l : lines) {
     if (label_refs.find(l.offset) != label_refs.end()) {
       ostringstream oss;
       oss << ".L_" << hex << l.offset << ":";
-      result.push_back({l.offset, 0, oss.str()});
+      result.push_back({l.offset, 0, oss.str(), LABEL_DEFN, 0, 0});
     }
-    result.push_back({l.offset, l.hex_bytes, fix_instruction(l.instr)});
+    result.push_back({l.offset, l.hex_bytes, fix_instruction(l.instr), l.opc, l.mem, l.imm});
   }
 
   return result;
@@ -465,7 +533,12 @@ bool Disassembler::parse_function(ipstream& ips, FunctionCallbackData& data, uin
   data.parse_error_msg = (failed(ss) ? fail_msg(ss) : "");
   data.name = name;
   data.tunit = {code, file_offset, rip_offset, capacity};
-
+  // dungnm: Update set of opcodes, memory addresses and immediates of this callback function
+  for (auto li : lines) {
+    data.opcodes.insert(li.opc);
+    if (li.mem != 0) data.mems.insert(li.mem);
+    if (li.imm != 0) data.immediates.insert(li.imm);
+  }
   return true;
 }
 
@@ -505,12 +578,118 @@ void Disassembler::disassemble(const std::string& filename) {
   }
   // Read the functions and invoke the callback.
   FunctionCallbackData data;
-  while (parse_function(*body, data, text_offset)) {
+  while (true) {
+    //cout << "####################### " << data.name << endl;
+    bool b = parse_function(*body, data, text_offset);
+    if (!b) return;
+    //for (auto op : data.opcodes) cout << op << endl;
+    //for (auto mem : data.mems) cout << mem << endl;
+    //for (auto im : data.immediates) cout << im << endl;
     if (!callback_closure_) {
       fxn_cb_(data, fxn_cb_arg_);
     } else {
       (*callback_closure_)(data);
     }
+  }
+}
+
+void Disassembler::diff(const std::string& pp, const std::string& pb, const std::string func) {
+  // We're starting out fresh, so reset the error tracker
+  clear_error();
+
+  auto text_offset_pp = 0;
+  auto text_offset_pb = 0;
+  if (!flat_binary_) {
+
+    // Get the headers from the objdump
+    auto headers_pp = run_objdump(pp, true);
+    auto headers_pb = run_objdump(pb, true);
+    if (has_error()) {
+      return;
+    }
+
+    // Parse the headers
+    const auto section_offsets_pp = parse_section_offsets(*headers_pp);
+    const auto section_offsets_pb = parse_section_offsets(*headers_pb);
+    const auto text_itr_pp = section_offsets_pp.find(".text");
+    const auto text_itr_pb = section_offsets_pb.find(".text");
+    if (text_itr_pp == section_offsets_pp.end() || text_itr_pb == section_offsets_pb.end()) {
+      set_error("Unable to find value for text section offset");
+      return;
+    }
+    text_offset_pp = text_itr_pp->second;
+    text_offset_pb = text_itr_pb->second;
+
+  }
+
+  // Get the disassembly from objdump
+  auto body_pp = run_objdump(pp, false);
+  auto body_pb = run_objdump(pb, false);
+  if (has_error()) {
+    return;
+  }
+  // Skip the first four lines of output and lines starting with 'D'
+  strip_lines(*body_pp, 4);
+  strip_lines(*body_pb, 4);
+  for (string line; getline(*body_pp, line) && line[0] == 'D';) {
+    // Does nothing
+  }
+  for (string line; getline(*body_pb, line) && line[0] == 'D';) {
+    // Does nothing
+  }
+  // Read the functions and invoke the callback.
+  //FunctionCallbackData data_pp;
+  //FunctionCallbackData data_pb;
+  while (true) {
+    //cout << "####################### " << data.name << endl;
+    FunctionCallbackData data_pp;
+    FunctionCallbackData data_pb;
+    bool b1 = parse_function(*body_pp, data_pp, text_offset_pp);
+    bool b2 = parse_function(*body_pb, data_pb, text_offset_pb);
+    if (!b1 || !b2) return;
+    set<x64asm::Opcode> op_pp, op_pb;
+    set<x64asm::Imm64> mem_pp, mem_pb, imm_pp, imm_pb;
+    if (data_pp.name == func) {
+      cout << "###################PATCH#########################" << endl;
+      op_pp = data_pp.opcodes;
+      mem_pp = data_pp.mems;
+      imm_pp = data_pp.immediates;
+      for (auto op : op_pp) cout << op << endl;
+      for (auto mem : mem_pp) cout << mem << endl;
+      for (auto imm : imm_pp) cout << imm << endl;
+    }
+    if (data_pb.name == func) {
+      cout << "###################BUGGY#########################" << endl;
+      op_pb = data_pb.opcodes;
+      mem_pb = data_pb.mems;
+      imm_pb = data_pb.immediates;
+      for (auto op : op_pb) cout << op << endl;
+      for (auto mem : mem_pb) cout << mem << endl;
+      for (auto imm : imm_pb) cout << imm << endl;
+
+      set<x64asm::Opcode> op_diff;
+      set<x64asm::Imm64> mem_diff, imm_diff;
+      set_difference(op_pp.begin(), op_pp.end(), op_pb.begin(), op_pb.end(), inserter(op_diff, op_diff.begin()));
+      set_difference(mem_pp.begin(), mem_pp.end(), mem_pb.begin(), mem_pb.end(), inserter(mem_diff, mem_diff.begin()));
+      set_difference(imm_pp.begin(), imm_pp.end(), imm_pb.begin(), imm_pb.end(), inserter(imm_diff, imm_diff.begin()));
+      cout << "*******************OPCODE**********************" << endl;
+      for (auto op_d : op_diff) cout << op_d << endl;
+      cout << "*******************MEMORY**********************" << endl;
+      for (auto mem_d : mem_diff) cout << mem_d << endl;
+      cout << "*******************IMMEDIATE**********************" << endl;
+      for (auto imm_d : imm_diff) cout << imm_d << endl;
+      cout << "*****************************************" << endl;
+    }
+    if (!callback_closure_) {
+      fxn_cb_(data_pp, fxn_cb_arg_);
+    } else {
+      (*callback_closure_)(data_pp);
+    }
+    //if (!callback_closure_pb) {
+      //fxn_cb_pb(data_pb, fxn_cb_arg_pb);
+    //} else {
+      //(*callback_closure_pb)(data_pb);
+    //}
   }
 }
 

@@ -22,6 +22,8 @@
 
 #include "src/disassembler/function_callback.h"
 
+using namespace x64asm;
+
 namespace stoke {
 
 class Disassembler {
@@ -68,6 +70,7 @@ public:
   /** Disassembles a file and invokes the function callback for each result. */
   void disassemble(const std::string& filename);
 
+  void diff(const std::string& pp, const std::string& pb, const std::string func);
 private:
   /** Tracks if an error occurred. */
   bool error_;
@@ -76,10 +79,13 @@ private:
 
   /** Callback to invoke when functions are parsed. */
   FunctionCallback fxn_cb_;
+  //FunctionCallback fxn_cb_pb;
   /** Argument to pass to function callback. */
   void* fxn_cb_arg_;
+  //void* fxn_cb_arg_pb;
   /** Closure-alternative to callback */
   Callback* callback_closure_ = NULL;
+  //Callback* callback_closure_pb = NULL;
 
   /** Should we tell objdump that we want a flat binary, rather than ELF? */
   bool flat_binary_;
@@ -89,6 +95,12 @@ private:
     uint64_t offset;   // logical hex offset
     size_t hex_bytes;  // number of hex bytes on this line
     std::string instr; // the text of this line
+    //std::string opcode; // opcode of this line
+    Opcode opc;
+    //Imm64 mem; //
+    uint64_t mem; // memory address of this line
+    //Imm64 imm; //
+    uint64_t imm; // immediate of this line
   };
 
   /** Clears error state */
@@ -124,7 +136,6 @@ private:
   /* Parse a single function from objdump's stdout; returns true until eof */
   bool parse_function(redi::ipstream& ips, FunctionCallbackData& data, uint64_t text_offset);
 };
-
 } // namespace stoke
 
 #endif

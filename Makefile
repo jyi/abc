@@ -225,7 +225,8 @@ BIN=\
         bin/stoke_search_patching \
 	bin/stoke_testcase \
 	bin/stoke_tcgen \
-        bin/stoke_extract_formulas \
+    bin/stoke_extract_formulas \
+	bin/stoke_diff \
 	\
 	bin/stoke_debug_cfg \
 	bin/stoke_debug_circuit \

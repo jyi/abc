@@ -38,22 +38,22 @@ auto& in = ValueArg<string>::create("i")
            .description("Binary file to extract code from")
            .default_val("./a.out");
 //auto& out = ValueArg<string>::create("o")
-            //.alternate("out")
-            //.usage("<path/to/dir>")
-            //.description("Directory to write results to")
-            //.default_val("out");
+//.alternate("out")
+//.usage("<path/to/dir>")
+//.description("Directory to write results to")
+//.default_val("out");
 
 //auto& io_bug = Heading::create("I/O options:");
 auto& in_bug = ValueArg<string>::create("i_bug")
-              .alternate("in_bug")
-              .usage("<path/to/bin_bug>")
-              .description("Binary buggy file to extract code from")
-              .default_val("./bug");
+               .alternate("in_bug")
+               .usage("<path/to/bin_bug>")
+               .description("Binary buggy file to extract code from")
+               .default_val("./bug");
 //auto& out_bug = ValueArg<string>::create("o_bug")
-                //.alternate("out_bug")
-                //.usage("<path/to/dir_bug>")
-                //.description("Buggy directory to write results to")
-                //.default_val("out_bug");
+//.alternate("out_bug")
+//.usage("<path/to/dir_bug>")
+//.description("Buggy directory to write results to")
+//.default_val("out_bug");
 
 auto& buggy_func = ValueArg<string>::create("bug_func");
 auto& flat_binary = FlagArg::create("flat_binary");
@@ -86,12 +86,12 @@ void callback(const FunctionCallbackData& data, void* arg) {
 }
 
 //void callback_pb(const FunctionCallbackData& data, void* arg) {
-  //if (!data.parse_error) {
-    ////ofstream ofs(out_bug.value() + "/" + data.tunit.get_name() + ".s");
-    ////ofs << data.tunit << endl;
-  //} else {
-    //Console::warn() << "Could not disassemble " << data.name << " (parse error)." << endl;
-  //}
+//if (!data.parse_error) {
+////ofstream ofs(out_bug.value() + "/" + data.tunit.get_name() + ".s");
+////ofs << data.tunit << endl;
+//} else {
+//Console::warn() << "Could not disassemble " << data.name << " (parse error)." << endl;
+//}
 //}
 
 int main(int argc, char** argv) {
@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
   DebugHandler::install_sigill();
 
   //if (!make_dir(out)) {
-    //Console::error(1) << "Unable to create output directory " << out.value() << "!" << endl;
+  //Console::error(1) << "Unable to create output directory " << out.value() << "!" << endl;
   //}
 
   Disassembler d;
