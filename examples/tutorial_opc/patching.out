@@ -1,0 +1,181 @@
+Running search (timeout is 60000000 iterations):
+
+Progress Update: 
+
+Lowest Cost Discovered (20)     Lowest Known Correct Cost (0)     
+                                                                  
+._Z6popcntm:                    ._Z6popcntm:                      
+testq %rdi, %rdi                testq %rdi, %rdi                  
+je .L_40062f                    je .L_40062f                      
+xorl %edi, %eax                 xorl %eax, %eax                   
+.L_400620:                      .L_400620:                        
+movl %edi, %edx                 movl %edi, %edx                   
+andl $0x5, %edi                 andl $0x1, %edx                   
+subl %eax, %eax                 addl %edx, %eax                   
+shrq $0x1, %rdi                 shrq $0x1, %rdi                   
+jne .L_400620                   jne .L_400620                     
+cltq                            cltq                              
+retq                            retq                              
+.L_40062f:                      .L_40062f:                        
+xorl %edi, %eax                 xorl %eax, %eax                   
+retq                            retq                              
+
+********************************************************************************
+
+Progress Update: 
+
+Lowest Cost Discovered (19)     Lowest Known Correct Cost (0)     
+                                                                  
+._Z6popcntm:                    ._Z6popcntm:                      
+testq %rdi, %rax                testq %rdi, %rdi                  
+je .L_40062f                    je .L_40062f                      
+xorl %eax, %eax                 xorl %eax, %eax                   
+.L_400620:                      .L_400620:                        
+movl %eax, %esp                 movl %edi, %edx                   
+andl $0x7, %edi                 andl $0x1, %edx                   
+subl %esp, %edi                 addl %edx, %eax                   
+shrq $0x1, %rax                 shrq $0x1, %rdi                   
+jne .L_400620                   jne .L_400620                     
+cltq                            cltq                              
+retq                            retq                              
+.L_40062f:                      .L_40062f:                        
+xorl %edi, %eax                 xorl %eax, %eax                   
+retq                            retq                              
+
+********************************************************************************
+
+Progress Update: 
+
+Lowest Cost Discovered (17)     Lowest Known Correct Cost (0)     
+                                                                  
+._Z6popcntm:                    ._Z6popcntm:                      
+testq %rdi, %rax                testq %rdi, %rdi                  
+je .L_40062f                    je .L_40062f                      
+xorl %eax, %edi                 xorl %eax, %eax                   
+.L_400620:                      .L_400620:                        
+movl %eax, %edx                 movl %edi, %edx                   
+andl $0x4, %eax                 andl $0x1, %edx                   
+movl %edi, %ebx                 addl %edx, %eax                   
+shrq $0x1, %rdi                 shrq $0x1, %rdi                   
+jne .L_400620                   jne .L_400620                     
+cltq                            cltq                              
+retq                            retq                              
+.L_40062f:                      .L_40062f:                        
+xorl %eax, %eax                 xorl %eax, %eax                   
+retq                            retq                              
+
+********************************************************************************
+
+Progress Update: 
+
+Lowest Cost Discovered (14)     Lowest Known Correct Cost (0)     
+                                                                  
+._Z6popcntm:                    ._Z6popcntm:                      
+testq %rax, %rax                testq %rdi, %rdi                  
+je .L_40062f                    je .L_40062f                      
+xorl %eax, %edi                 xorl %eax, %eax                   
+.L_400620:                      .L_400620:                        
+movl %edi, %edi                 movl %edi, %edx                   
+andl $0x6, %eax                 andl $0x1, %edx                   
+movl %eax, %edx                 addl %edx, %eax                   
+shrq $0x1, %rdi                 shrq $0x1, %rdi                   
+jne .L_400620                   jne .L_400620                     
+cltq                            cltq                              
+retq                            retq                              
+.L_40062f:                      .L_40062f:                        
+xorl %eax, %edi                 xorl %eax, %eax                   
+retq                            retq                              
+
+********************************************************************************
+
+Progress Update: 
+
+Lowest Cost Discovered (12)     Lowest Known Correct Cost (0)     
+                                                                  
+._Z6popcntm:                    ._Z6popcntm:                      
+testq %rax, %rax                testq %rdi, %rdi                  
+je .L_40062f                    je .L_40062f                      
+xorl %eax, %eax                 xorl %eax, %eax                   
+.L_400620:                      .L_400620:                        
+addl %edi, %eax                 movl %edi, %edx                   
+andl $0x7, %eax                 andl $0x1, %edx                   
+movl %edi, %esp                 addl %edx, %eax                   
+shrq $0x1, %rdi                 shrq $0x1, %rdi                   
+jne .L_400620                   jne .L_400620                     
+cltq                            cltq                              
+retq                            retq                              
+.L_40062f:                      .L_40062f:                        
+xorl %eax, %eax                 xorl %eax, %eax                   
+retq                            retq                              
+
+********************************************************************************
+
+Progress Update: 
+
+Lowest Cost Discovered (0)     Lowest Known Correct Cost (0)     
+                                                                 
+._Z6popcntm:                   ._Z6popcntm:                      
+testq %rdi, %rax               testq %rdi, %rax                  
+je .L_40062f                   je .L_40062f                      
+xorl %eax, %eax                xorl %eax, %eax                   
+.L_400620:                     .L_400620:                        
+movl %edi, %r14d               movl %edi, %r14d                  
+andl $0x1, %r14d               andl $0x1, %r14d                  
+addl %r14d, %eax               addl %r14d, %eax                  
+shrq $0x1, %rdi                shrq $0x1, %rdi                   
+jne .L_400620                  jne .L_400620                     
+cltq                           cltq                              
+retq                           retq                              
+.L_40062f:                     .L_40062f:                        
+xorl %edi, %edi                xorl %edi, %edi                   
+retq                           retq                              
+
+********************************************************************************
+
+################################################################################
+
+Final update:
+
+Total search iterations:       707619
+Number of attempted searches:  1
+Total search time:             1.62553s
+Total time:                    2.09071s
+
+Statistics of last search
+
+Iterations:                    707619
+Elapsed Time:                  1.62546s
+Iterations/s:                  435335
+
+Starting cost:                 28
+Lowest cost:                   0
+Lowest correct cost:           0
+
+Move Type     Proposed     Succeeded     Accepted     
+                                                      
+Opcode        49.9386%     1.3202%       1.26028%     
+Operand       50.0614%     7.31199%      6.87093%     
+                                                      
+Total         100%         8.63219%      8.13121%     
+
+Lowest Cost Discovered (0)     Lowest Known Correct Cost (0)     
+                                                                 
+._Z6popcntm:                   ._Z6popcntm:                      
+testq %rdi, %rax               testq %rdi, %rax                  
+je .L_40062f                   je .L_40062f                      
+xorl %eax, %eax                xorl %eax, %eax                   
+.L_400620:                     .L_400620:                        
+movl %edi, %r14d               movl %edi, %r14d                  
+andl $0x1, %r14d               andl $0x1, %r14d                  
+addl %r14d, %eax               addl %r14d, %eax                  
+shrq $0x1, %rdi                shrq $0x1, %rdi                   
+jne .L_400620                  jne .L_400620                     
+cltq                           cltq                              
+retq                           retq                              
+.L_40062f:                     .L_40062f:                        
+xorl %edi, %edi                xorl %edi, %edi                   
+retq                           retq                              
+
+################################################################################
+
+Search terminated successfully with a verified rewrite!
