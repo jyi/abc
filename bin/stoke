@@ -121,6 +121,9 @@ then
 elif [ "$SCMD" == "extract" ]
 then
 	exec $HERE/stoke_extract "$@"
+elif [ "$SCMD" == "diff" ]
+then
+	exec $HERE/stoke_diff "$@"
 elif [ "$SCMD" == "replace" ]
 then
 	exec $HERE/stoke_replace "$@"
@@ -133,6 +136,9 @@ then
 elif [ "$SCMD" == "optimize" ]
 then
 	exec $HERE/stoke_search --init target "$@"
+elif [ "$SCMD" == "patch" ]
+then
+    exec $HERE/stoke_search_patching "$@"
 elif [ "$SCMD" == "testcase" ]
 then
 	exec $HERE/stoke_testcase "$@"

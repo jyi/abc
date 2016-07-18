@@ -26,7 +26,7 @@ extract:
 extract_bug:
 	stoke extract --config extract_bug.conf
 diff:
-	stoke_diff --config diff.conf
+	stoke diff --config diff.conf
 testcases:
 	stoke testcase --target bins/_Z6paritym.s > parity.tc
 

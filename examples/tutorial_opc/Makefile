@@ -29,7 +29,8 @@ testcase:
 
 synthesize:
 	stoke synthesize --config synthesize.conf
-
+patch:
+	stoke patch --config search_patching.conf
 # 'make check' should always work unless there's
 # a bug in 'stoke debug verify' or 'stoke synthesize'
 # or the search just fails.
